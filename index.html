@@ -69,6 +69,10 @@
                 <td>검색 코드</td>
                 <td><input type="text" id="searchCode" name="searchCode" placeholder="예: C202401001"></td>
             </tr>
+            <tr>
+                <td>생년 월일</td>
+                <td><input type="text" id="birthdate" name="birthdate" placeholder="주민번호 앞 6자리 예: 910731"></td>
+            </tr>           
         </table>
         <button type="submit">검색</button>
     </form>
@@ -83,6 +87,7 @@
     var month = parseInt(searchDate.substring(2, 4)) - 1;
     var day = parseInt(searchDate.substring(4, 6));
     var inputDate = new Date(year, month, day);
+   
 
     // 🔹 입력 날짜의 요일을 가져옴 (0: 일요일 ~ 6: 토요일)
     var dayOfWeek = inputDate.getDay();
@@ -113,6 +118,7 @@
 
                 var searchDate = $('#searchDate').val().trim();
                 var searchCode = $('#searchCode').val().trim().toUpperCase(); // 대소문자 구별 X
+                var birthdate = $('#birthdate').val().trim();
 
                 if (!/^\d{6}$/.test(searchDate)) {
                     alert("입금 날짜는 6자리 숫자로 입력하세요. (예: 250307)");
@@ -124,14 +130,19 @@
                     $(this).data("processing", false);
                     return;
                 }
+                if (!/^\d{6}$/.test(birthdate)) {
+                    alert("주민번호 앞 6자리를 입력하세요. (예: 910731)");
+                    $(this).data("processing", false);
+                    return;
 
                 $.ajax({
-                    url: 'https://script.google.com/macros/s/AKfycbwS-d1_SyucL0OMD_GHRvdRq7OQLfuMU73194kEwYG4qW55aoDcB2GnLNB4Trbcuym8JQ/exec',
+                    url: 'https://script.google.com/a/macros/vroongriders.com/s/AKfycbwoyApzr9IffKS3hgDYJRzp4eOO2Nt2VqdCrbQx4F21UK8K4J7x4dYdhbOcVG2lpDCK/exec',
                     type: 'GET',
                     dataType: 'json',
                     data: { 
                         searchDate: searchDate,
-                        searchCode: searchCode
+                        searchCode: searchCode,
+                        birthdate: birthdate
                     },
                     success: function(data) {
                         $('#searchForm').data("processing", false);
