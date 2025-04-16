@@ -100,10 +100,15 @@
         <td>사업자명</td>
         <td colspan="3"><input type="text" id="bizName" name="bizName" placeholder="사업자명 : "></td>
       </tr>
-    </tbody>
-  </table>
+      <tr>
+        <td colspan="4">
+          <button type="submit">검색</button>
+        </td>
+      </tr>
+    </table>
+  </form>
 
-  <h3>검색 결과</h3>
+  <h3 id="resultTitle">검색 결과</h3>
   <div id="result"></div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
