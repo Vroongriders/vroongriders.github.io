@@ -79,26 +79,29 @@
           </select>
         </td>
       </tr>
-      
-      <tr class="rider-field" style="display: none;">
+    </tbody>
+    <tbody class="rider-field" style="display: none;">
+      <tr>
         <td>검색 아이디</td>
         <td colspan="3"><input type="text" id="searchCode" name="searchCode" placeholder="배민커넥트 아이디 : "></td>
       </tr>
-      <tr class="rider-field" style="display: none;">
+      <tr>
         <td>생년 월일</td>
         <td colspan="3"><input type="text" id="birthdate" name="birthdate" placeholder="주민번호 앞 6자리 예: 910731"></td>
       </tr>
-      <tr class="manager-field" style="display: none;">
+    </tbody>
+  
+    <tbody class="manager-field" style="display: none;">
+      <tr>
         <td>사업자번호</td>
         <td colspan="3"><input type="text" id="bizNumber" name="bizNumber" placeholder="사업자번호 : "></td>
       </tr>
-      <tr class="manager-field" style="display: none;">
+      <tr>
         <td>사업자명</td>
         <td colspan="3"><input type="text" id="bizName" name="bizName" placeholder="사업자명 : "></td>
       </tr>
-    </table>
-    <button type="submit">검색</button>
-  </form>
+    </tbody>
+  </table>
 
   <h3>검색 결과</h3>
   <div id="result"></div>
@@ -148,6 +151,13 @@
 
     $(document).ready(function () {
       generateRecentFridays(8); // ⭐ 드롭다운 자동 생성
+
+      $('#userType').on('change', function () {
+      const selected = $(this).val();
+      $('.rider-field, .manager-field').hide();
+      if (selected === 'rider') $('.rider-field').show();
+      else if (selected === 'manager') $('.manager-field').show();
+      });
 
       $('#searchForm').submit(function (event) {
         event.preventDefault();
