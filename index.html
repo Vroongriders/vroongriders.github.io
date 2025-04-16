@@ -62,24 +62,33 @@
   <form id="searchForm">
     <table>
       <tr>
-        <td>입금 날짜</td>
-        <td>
+        <td colspan="2">입금 날짜</td>
+        <td colspan="2">
           <select id="searchDate" name="searchDate">
             <option value="">-- 정산 주 선택 --</option>
           </select>
         </td>
       </tr>
       <tr>
+        <th colspan="2">라이더용</th>
+        <th colspan="2">지점장용</th>
+      </tr>
+      <tr>
         <td>검색 아이디</td>
         <td><input type="text" id="searchCode" name="searchCode" placeholder="배민커넥트 아이디 : " /></td>
+        <td>검색 사업자명</td>
+        <td><input type="text" id="bizName" name="bizName" placeholder="사업자명 : " /></td>
       </tr>
       <tr>
         <td>생년 월일</td>
         <td><input type="text" id="birthdate" name="birthdate" placeholder="주민번호 앞 6자리 예: 910731" /></td>
+        <td>사업자번호</td>
+        <td><input type="text" id="bizNumber" name="bizNumber" placeholder="사업자번호 : " /></td>
       </tr>
     </table>
     <button type="submit">검색</button>
   </form>
+  
 
   <h3>검색 결과</h3>
   <div id="result"></div>
@@ -128,7 +137,7 @@
     }
 
     $(document).ready(function () {
-      generateRecentFridays(); // ⭐ 드롭다운 자동 생성
+      generateRecentFridays(8); // ⭐ 드롭다운 자동 생성
 
       $('#searchForm').submit(function (event) {
         event.preventDefault();
@@ -139,6 +148,9 @@
         const searchDate = $('#searchDate').val().trim();
         const searchCode = $('#searchCode').val().trim().toUpperCase();
         const birthdate = $('#birthdate').val().trim();
+        const bizNumber = $('#bizNumber').val().trim();
+        const bizName = $('#bizName').val().trim();
+
 
         if (!/^\d{6}$/.test(searchDate)) {
           alert("입금 날짜를 선택하세요.");
@@ -155,6 +167,17 @@
           $(this).data("processing", false);
           return;
         }
+        if (!/^\d{11}$/.test(bizNumber)) {
+          alert("사업자등록번호 11자리를 입력하세요. (예: 5778601293)");
+          $(this).data("processing", false);
+          return;
+        }
+        if (!bizName) {
+          alert("성함을 입력해주세요.");
+          $(this).data("processing", false);
+          return;
+        }
+
 
         $.ajax({
           url: 'https://script.google.com/a/macros/vroongriders.com/s/AKfycbwoyApzr9IffKS3hgDYJRzp4eOO2Nt2VqdCrbQx4F21UK8K4J7x4dYdhbOcVG2lpDCK/exec',
@@ -163,7 +186,9 @@
           data: {
             searchDate: searchDate,
             searchCode: searchCode,
-            birthdate: birthdate
+            birthdate: birthdate,
+            bizNumber: bizNumber,
+            bizName: bizName
           },
           success: function (data) {
             $('#searchForm').data("processing", false);
