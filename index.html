@@ -58,7 +58,6 @@
 </head>
 <body>
   <h2>부릉라이더스 정산서 조회</h2>
-  <p>코드 및 정산 문의 : 010-9785-1293</p>
   <form id="searchForm">
     <table>
       <tr>
@@ -70,21 +69,39 @@
         </td>
       </tr>
       <tr>
-        <th colspan="2">라이더용</th>
-        <th colspan="2">지점장용</th>
+        <td colspan="2">조회 대상 선택</td>
+        <td colspan="2">
+          <select id="userType" name="userType">
+            <option value="">-- 선택하세요 --</option>
+            <option value="rider">라이더</option>
+            <option value="manager">지점장</option>
+          </select>
+        </td>
       </tr>
-      <tr>
-        <td>검색 아이디</td>
-        <td><input type="text" id="searchCode" name="searchCode" placeholder="배민커넥트 아이디 : " /></td>
-        <td>검색 사업자명</td>
-        <td><input type="text" id="bizName" name="bizName" placeholder="사업자명 : " /></td>
-      </tr>
-      <tr>
-        <td>생년 월일</td>
-        <td><input type="text" id="birthdate" name="birthdate" placeholder="주민번호 앞 6자리 예: 910731" /></td>
-        <td>사업자번호</td>
-        <td><input type="text" id="bizNumber" name="bizNumber" placeholder="사업자번호 : " /></td>
-      </tr>
+    </table>
+
+    <table>
+      <tbody id="riderFields" style="display: none;">
+        <tr>
+          <td>검색 아이디</td>
+          <td colspan="3"><input type="text" id="searchCode" name="searchCode" placeholder="배민커넥트 아이디 : "></td>
+        </tr>
+        <tr>
+          <td>생년 월일</td>
+          <td colspan="3"><input type="text" id="birthdate" name="birthdate" placeholder="주민번호 앞 6자리 예: 910731"></td>
+        </tr>
+      </tbody>
+
+      <tbody id="managerFields" style="display: none;">
+        <tr>
+          <td>사업자번호</td>
+          <td colspan="3"><input type="text" id="bizNumber" name="bizNumber" placeholder="사업자번호 : "></td>
+        </tr>
+        <tr>
+          <td>사업자명</td>
+          <td colspan="3"><input type="text" id="bizName" name="bizName" placeholder="사업자명 : "></td>
+        </tr>
+      </tbody>
     </table>
     <button type="submit">검색</button>
   </form>
@@ -146,36 +163,46 @@
         $(this).data("processing", true);
 
         const searchDate = $('#searchDate').val().trim();
-        const searchCode = $('#searchCode').val().trim().toUpperCase();
+        const userType = $('#userType').val();
+        const searchCode = $('#searchCode').val().trim();
         const birthdate = $('#birthdate').val().trim();
         const bizNumber = $('#bizNumber').val().trim();
         const bizName = $('#bizName').val().trim();
 
-
-        if (!/^\d{6}$/.test(searchDate)) {
+        if (!/\d{6}/.test(searchDate)) {
           alert("입금 날짜를 선택하세요.");
           $(this).data("processing", false);
           return;
         }
-        if (!searchCode) {
-          alert("배민커넥트 아이디를 입력해주세요.");
+
+        if (!userType) {
+          alert("조회 대상을 선택하세요.");
           $(this).data("processing", false);
           return;
         }
-        if (!/^\d{6}$/.test(birthdate)) {
-          alert("주민번호 앞 6자리를 입력하세요. (예: 910731)");
-          $(this).data("processing", false);
-          return;
-        }
-        if (!/^\d{11}$/.test(bizNumber)) {
-          alert("사업자등록번호 11자리를 입력하세요. (예: 5778601293)");
-          $(this).data("processing", false);
-          return;
-        }
-        if (!bizName) {
-          alert("성함을 입력해주세요.");
-          $(this).data("processing", false);
-          return;
+
+        if (userType === 'rider') {
+          if (!searchCode) {
+            alert("아이디를 입력해주세요.");
+            $(this).data("processing", false);
+            return;
+          }
+          if (!/^\d{6}$/.test(birthdate)) {
+            alert("생년월일 6자리를 입력해주세요.");
+            $(this).data("processing", false);
+            return;
+          }
+        } else if (userType === 'manager') {
+          if (!/^\d{11}$/.test(bizNumber)) {
+            alert("사업자등록번호 11자리를 입력하세요.");
+            $(this).data("processing", false);
+            return;
+          }
+          if (!bizName) {
+            alert("사업자명을 입력해주세요.");
+            $(this).data("processing", false);
+            return;
+          }
         }
 
 
