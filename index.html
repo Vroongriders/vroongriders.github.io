@@ -35,9 +35,19 @@
       font-weight: bold;
     }
     input, select {
-      width: 95%;
-      padding: 8px;
-      font-size: 14px;
+      width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+    text-align: center;
+
+    /* 크기 차이 없애기 */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    border: 1px solid #ccc;
+    border-radius: 4px;
     }
     button {
       background-color: #4CAF50;
@@ -54,11 +64,29 @@
     #result {
       margin-top: 20px;
     }
+    #resultTitle {
+      display: none;
+    }
+    @media screen and (max-width: 768px) {
+      table, tr, td, th {
+        display: block;
+        width: 100%;
+      }
+      tr {
+        margin-bottom: 10px;
+      }
+      td, th {
+        text-align: left;
+        padding: 10px;
+        border: none;
+        border-bottom: 1px solid #ccc;
+      }
+    }
   </style>
 </head>
 <body>
   <h2>부릉라이더스 정산서 조회</h2>
-  <p>코드 및 정산 문의 : 부릉라이더스 카카오톡 채널 </p>
+  <p>코드 및 정산 문의 : 부릉라이더스 카카오톡 채널</p>
   <form id="searchForm">
     <table>
       <tr>
@@ -79,56 +107,52 @@
           </select>
         </td>
       </tr>
-    </tbody>
-    <tbody class="rider-field" style="display: none;">
-      <tr>
-        <td>검색 아이디</td>
-        <td colspan="3"><input type="text" id="searchCode" name="searchCode" placeholder="배민커넥트 아이디 : "></td>
+
+      <tbody class="rider-field" style="display: none;">
+        <tr>
+          <td>검색 아이디</td>
+          <td colspan="3"><input type="text" id="searchCode" name="searchCode" placeholder="배민커넥트 아이디 : "></td>
+        </tr>
+        <tr>
+          <td>생년 월일</td>
+          <td colspan="3"><input type="text" id="birthdate" name="birthdate" placeholder="주민번호 앞 6자리 예: 910731"></td>
+        </tr>
+      </tbody>
+      <tbody class="manager-field" style="display: none;">
+        <tr>
+          <td>사업자번호</td>
+          <td colspan="3"><input type="text" id="bizNumber" name="bizNumber" placeholder="사업자번호 : "></td>
+        </tr>
+        <tr>
+          <td>DP코드 뒷 4자리</td>
+          <td colspan="3"><input type="text" id="bizName" name="bizName" placeholder="DP코드 뒷 4자리 : "></td>
+        </tr>
+      </tbody>
+      <tr id="searchButtonRow" style="display: none;">
+        <td colspan="4">
+          <button type="submit">검색</button>
+        </td>
       </tr>
-      <tr>
-        <td>생년 월일</td>
-        <td colspan="3"><input type="text" id="birthdate" name="birthdate" placeholder="주민번호 앞 6자리 예: 910731"></td>
-      </tr>
-    </tbody>
-    <tbody class="manager-field" style="display: none;">
-      <tr>
-        <td>사업자번호</td>
-        <td colspan="3"><input type="text" id="bizNumber" name="bizNumber" placeholder="사업자번호 : "></td>
-      </tr>
-      <tr>
-        <td>사업자명</td>
-        <td colspan="3"><input type="text" id="bizName" name="bizName" placeholder="사업자명 : "></td>
-      </tr>
-    </tbody>
-    <tr>
-      <td colspan="4">
-        <button type="submit">검색</button>
-      </td>
-    </tr>
-  </table>
-</form>
+    </table>
+  </form>
 
   <h3 id="resultTitle">검색 결과</h3>
   <div id="result"></div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-    function generateRecentFridays(count = 12) {
+    function generateRecentFridays(count = 8) {
       const dropdown = $('#searchDate');
       const today = new Date();
-
       for (let i = 0; i < count; i++) {
         const friday = new Date(today);
         const day = friday.getDay();
-        // 이번 주 금요일을 기준으로 이전 주 금요일 계산
         friday.setDate(today.getDate() - ((day + 2) % 7) - (7 * i));
-
         const yy = String(friday.getFullYear()).substring(2);
         const mm = String(friday.getMonth() + 1).padStart(2, '0');
         const dd = String(friday.getDate()).padStart(2, '0');
         const value = `${yy}${mm}${dd}`;
         const label = `${mm}월 ${dd}일 입금`;
-
         dropdown.append(`<option value="${value}">${label}</option>`);
       }
     }
@@ -138,35 +162,37 @@
       const month = parseInt(searchDate.substring(2, 4)) - 1;
       const day = parseInt(searchDate.substring(4, 6));
       const inputDate = new Date(year, month, day);
-
-      const dayOfWeek = inputDate.getDay();
-      const wednesdayDate = new Date(inputDate);
-      wednesdayDate.setDate(inputDate.getDate() - dayOfWeek - 4);
-      const tuesdayDate = new Date(wednesdayDate);
-      tuesdayDate.setDate(wednesdayDate.getDate() + 6);
-
-      function formatDate(date) {
-        const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const dd = String(date.getDate()).padStart(2, '0');
-        return mm + "/" + dd;
-      }
-
-      return formatDate(wednesdayDate) + " ~ " + formatDate(tuesdayDate);
+      const wednesday = new Date(inputDate);
+      wednesday.setDate(inputDate.getDate() - inputDate.getDay() - 4);
+      const tuesday = new Date(wednesday);
+      tuesday.setDate(wednesday.getDate() + 6);
+      const formatDate = (date) => `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`;
+      return formatDate(wednesday) + " ~ " + formatDate(tuesday);
     }
 
     $(document).ready(function () {
-      generateRecentFridays(8); // ⭐ 드롭다운 자동 생성
+      generateRecentFridays();
 
       $('#userType').on('change', function () {
       const selected = $(this).val();
       $('.rider-field, .manager-field').hide();
-      if (selected === 'rider') $('.rider-field').show();
-      else if (selected === 'manager') $('.manager-field').show();
+
+      if (selected === 'rider') {
+       $('.rider-field').show();
+      } else if (selected === 'manager') {
+       $('.manager-field').show();
+     }
+
+     if (selected) {
+       $('#searchButtonRow').show();
+      } else {
+      $('#searchButtonRow').hide();
+     }
       });
+
 
       $('#searchForm').submit(function (event) {
         event.preventDefault();
-
         if ($(this).data("processing")) return;
         $(this).data("processing", true);
 
@@ -201,40 +227,33 @@
             return;
           }
         } else if (userType === 'manager') {
-          if (!/^\d{11}$/.test(bizNumber)) {
-            alert("사업자등록번호 11자리를 입력하세요.");
+          if (!/^\d{111}$/.test(bizNumber)) {
+            alert("지점장 조회는 현재 준비 중 입니다.");
             $(this).data("processing", false);
             return;
           }
           if (!bizName) {
-            alert("사업자명을 입력해주세요.");
+            alert("DP코드 뒷 4자리를 입력해주세요.");
             $(this).data("processing", false);
             return;
           }
         }
-
 
         $.ajax({
           url: 'https://script.google.com/a/macros/vroongriders.com/s/AKfycbwoyApzr9IffKS3hgDYJRzp4eOO2Nt2VqdCrbQx4F21UK8K4J7x4dYdhbOcVG2lpDCK/exec',
           type: 'GET',
           dataType: 'json',
           data: {
-            searchDate: searchDate,
-            searchCode: searchCode,
-            birthdate: birthdate,
-            bizNumber: bizNumber,
-            bizName: bizName
+            searchDate, searchCode, birthdate, bizNumber, bizName
           },
           success: function (data) {
             $('#searchForm').data("processing", false);
-
+            $('#resultTitle').show();
             if (data.error) {
               $('#result').html("<p style='color:red'>" + data.error + "</p>");
               return;
             }
-
             const calculatedPeriod = calculatePeriod(searchDate);
-
             const tableHtml = `
               <table>
                 <tr><th colspan="2">개인별 정산서</th></tr>
@@ -256,11 +275,11 @@
                 <tr><td>2차 지급액 (금요일)</td><td>${data.secondPayment}</td></tr>
                 <tr><td colspan="2">정산문의: ${data.contact}</td></tr>
               </table>`;
-
             $('#result').html(tableHtml);
           },
           error: function () {
             $('#searchForm').data("processing", false);
+            $('#resultTitle').show();
             $('#result').html("<p style='color:red'>오류가 발생했습니다. 다시 시도해주세요.</p>");
           }
         });
