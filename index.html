@@ -122,8 +122,8 @@
           <td colspan="3"><input type="text" id="bizNumber" name="bizNumber" placeholder="사업자번호 : "></td>
         </tr>
         <tr>
-          <td>DP코드 뒷 4자리</td>
-          <td colspan="3"><input type="text" id="dpCode" name="dpCode" placeholder="DP코드 뒷 4자리 : "></td>
+          <td>협력사명</td>
+          <td colspan="3"><input type="text" id="bizName" name="bizName" placeholder="서울강남부릉라이더스 "></td>
         </tr>
       </tbody>
       <tr id="searchButtonRow" style="display: none;">
@@ -175,10 +175,10 @@
         else if (selected === 'manager') $('.manager-field').show();
 
         $('#searchButtonRow').toggle(!!selected);
-        $('#searchId, #riderName, #bizNumber, #dpCode').val('');
+        $('#searchId, #riderName, #bizNumber, #bizName').val('');
       });
 
-      $('#searchDate, #searchId, #riderName, #bizNumber, #dpCode, #userType').on('input change', function () {
+      $('#searchDate, #searchId, #riderName, #bizNumber, #bizName, #userType').on('input change', function () {
         $('#result').empty();
         $('#resultTitle').hide();
       });
@@ -192,8 +192,8 @@
         const userType = $('#userType').val();
         const searchId = $('#searchId').val().trim();
         const riderName = $('#riderName').val().trim();
-        const bizNumber = $('#bizNumber').val().trim();
-        const dpCode = $('#dpCode').val().trim();
+        const bizNumber = $('#bizNumber').val().trim().padStart(10, '0');
+        const bizName = $('#bizName').val().trim();
 
         if (!/\d{6}/.test(searchDate)) {
           alert("입금 날짜를 선택하세요.");
@@ -218,17 +218,12 @@
             $(this).data("processing", false);
             return;
           }
-        } else if (userType === 'manager') {
-          alert("지점장 조회는 준비 중입니다.");
-          $(this).data("processing", false);
-          return;
-        }
 
-        $.ajax({
+          $.ajax({
           url: 'https://script.google.com/macros/s/AKfycbwL99Yvfz-170pE1axrWLSchtiHbNrN3OidZMKI6hJomw-__eD_MoPeNsXUCt7FDihi/exec',
           type: 'GET',
           dataType: 'json',
-          data: { searchDate, searchId, riderName, bizNumber, dpCode, userType },
+          data: { searchDate, searchId, riderName, userType },
           success: function (data) {
             $('#searchForm').data("processing", false);
             $('#resultTitle').show();
@@ -267,6 +262,59 @@
             $('#result').html("<p style='color:red'>오류가 발생했습니다. 다시 시도해주세요.</p>");
           }
         });
+
+       } else if (userType === 'manager') {
+          if(!/\d{10}/.test(bizNumber)) {
+          alert("사업자번호 10자리를 입력해주세요.");
+          $(this).data("processing", false);
+          return;
+        }
+          if(!bizName) {
+            alert("협력사명을 입력해주세요.");
+            $(this).data("processing",false);
+            return;
+          }
+
+          $.ajax({
+            url: 'https://script.google.com/macros/s/AKfycbxH_yQvTE3HMs59wjGHuUpOXZzH3anlVJNuQWZmNpIjA5SJHB8Gff6es8C9ayh4gBCyCg/exec',
+            type: 'GET',
+            dataType: 'json',
+            data: { searchDate, bizNumber, bizName, userType },
+            success: function (data) {
+              $('#searchForm').data("processing", false);
+              $('#resultTitle').show();
+
+              if (data.error) {
+                $('#result').html("<p style='color:red'>" + data.error + "</p>");
+                return;
+              }
+
+              const tableHtml = `
+                <table>
+                  <tr><th colspan="2">지점별 정산서</th></tr>
+                  <tr><td>사업자번호</td><td>${data.biznumber}</td></tr>
+                  <tr><td>지점 수행 건수</td><td>${data.orders}</td></tr>
+                  <tr><td>협력사명</td><td>${data.dpname}</td></tr>
+                  <tr><td>관리비</td><td>${data.manage_fee}</td></tr>
+                  <tr><td>사회보장보험료 사업자분</td><td>${data.rider_insurance}</td></tr>
+                  <tr><td>지점 운영 수수료</td><td>${data.partner_fee}</td></tr>
+                  <tr><td>SLA달성 페이백</td><td>${data.payback}</td></tr>
+                  <tr><td>라이더 -> 지점장</td><td>${data.ridertomanager}</td></tr>
+                  <tr><td>프로모션</td><td>${data.promotion}</td></tr>
+                  <tr><td>지급 관리비(vat포함)</td><td>${data.includevat}</td></tr>
+                  <tr><td>총 지급 금액</td><td>${data.amount}</td></tr>
+                  <tr><td colspan="2" class="footer">정산문의: ${data.contact}</td></tr>
+                </table>
+              `;
+              $('#result').html(tableHtml);
+            },
+            error: function () {
+              $('#searchForm').data("processing", false);
+              $('#resultTitle').show();
+              $('#result').html("<p style='color:red'>오류가 발생했습니다. 다시 시도해주세요.</p>");
+            }
+          });
+        }
       });
     });
   </script>
