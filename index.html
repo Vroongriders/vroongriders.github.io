@@ -83,7 +83,7 @@
 </head>
 <body>
   <h2>부릉라이더스 정산서 조회</h2>
-  <p>코드 및 정산 문의 : 부릉라이더스 카카오톡 채널</p>
+  <p></p>
 
   <form id="searchForm">
     <table>
@@ -119,11 +119,11 @@
       <tbody class="manager-field" style="display: none;">
         <tr>
           <td>사업자번호</td>
-          <td colspan="3"><input type="text" id="bizNumber" name="bizNumber" placeholder="사업자번호 : "></td>
+          <td colspan="3"><input type="text" id="bizNumber" name="bizNumber" placeholder=" (-) 하이픈 제외 10자리 "></td>
         </tr>
         <tr>
           <td>협력사명</td>
-          <td colspan="3"><input type="text" id="bizName" name="bizName" placeholder="서울강남부릉라이더스 "></td>
+          <td colspan="3"><input type="text" id="bizName" name="bizName" placeholder="예 : 서울강남부릉라이더스2 "></td>
         </tr>
       </tbody>
       <tr id="searchButtonRow" style="display: none;">
@@ -147,7 +147,7 @@
       return friday;
     }
 
-    function generateRecentFridays(count = 8) {
+    function generateRecentFridays(count = 2) {
       const dropdown = $('#searchDate');
       const baseFriday = getLastFriday();
 
